@@ -1,0 +1,10 @@
+
+body {
+    overflow: hidden;
+}
+
+canvas {
+   
+        transform: translateX(850px) translateY(-400px);
+
+  }
