@@ -16,10 +16,13 @@ const ExtrudeGeometry = (props) => {
 
         // Create a new renderer
         const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(300,300)
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(700,800)
+        // renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
+        // Create an axes helper
+        const axesHelper = new THREE.AxesHelper(5);
+        scene.add(axesHelper);
         // Define the geometry of the square section rod
         const size = 0.05; // The size of the rod
     
@@ -37,14 +40,15 @@ const ExtrudeGeometry = (props) => {
           })
 
         // Create a new mesh using the material and geometry
-        const mesh1 = new THREE.Mesh(geometry1, material);
-        const mesh2 = new THREE.Mesh(geometry1, material);
-        const mesh3 = new THREE.Mesh(geometry1, material);
-        const mesh4 = new THREE.Mesh(geometry1, material);
-        const mesh5 = new THREE.Mesh(geometry2, material);
-        const mesh6 = new THREE.Mesh(geometry2, material);
-        const mesh7 = new THREE.Mesh(geometry2, material);
-        const mesh8 = new THREE.Mesh(geometry2, material);
+        
+        const mesh1 = new THREE.Mesh(geometry2, material);
+        const mesh2 = new THREE.Mesh(geometry2, material);
+        const mesh3 = new THREE.Mesh(geometry2, material);
+        const mesh4 = new THREE.Mesh(geometry2, material);
+        const mesh5 = new THREE.Mesh(geometry1, material);
+        const mesh6 = new THREE.Mesh(geometry1, material);
+        const mesh7 = new THREE.Mesh(geometry1, material);
+        const mesh8 = new THREE.Mesh(geometry1, material);
         const mesh9 = new THREE.Mesh(geometry3, material);
         const mesh10 = new THREE.Mesh(geometry3, material);
         const mesh11 = new THREE.Mesh(geometry3, material);
@@ -52,33 +56,32 @@ const ExtrudeGeometry = (props) => {
 
           mesh1.position.set(0,0,0);
           mesh2.position.set(
-            parseFloat(props.width) - size / 2,
-            parseFloat(props.height) / 2,
+            parseFloat(props.width),
+            0,
             size
           );
           mesh3.position.set(
-            size / 2,
-            parseFloat(props.height) / 2,
-            parseFloat(props.depth) - size
+            0,
+            0,
+            parseFloat(props.depth)
           );
           mesh4.position.set(
-            parseFloat(props.width) - size / 2,
-            parseFloat(props.height) / 2,
+            parseFloat(props.width),
+            0,
             parseFloat(props.depth)
           );
           // rod5.position.set((2.5-0.25),2.5+0.25,0);
-          mesh5.position.set(0, parseFloat(props.height) / 2 - size / 2, size);
+          mesh5.position.set(parseFloat(props.width)/2,parseFloat(props.height) / 2, 0);
           // rod6.position.set(2.5-0.25,2.5+0.25,5+0.25);
           mesh6.position.set(
-            0,
-            parseFloat(props.height) / 2 - size / 2,
+            parseFloat(props.width)/2,parseFloat(props.height) / 2,
             parseFloat(props.depth)
           );
           // rod7.position.set(2.5-0.25,-2.5-0.25,0);
-          mesh7.position.set(0, -(parseFloat(props.height) / 2 - size / 2), 0);
+          mesh7.position.set(parseFloat(props.width)/2, -(parseFloat(props.height) / 2 - size / 2), 0);
           // rod8.position.set(2.5-0.25,-2.75,5+0.25);
           mesh8.position.set(
-            0,
+            parseFloat(props.width)/2,
             -(parseFloat(props.height) / 2 - size / 2),
             parseFloat(props.depth) - size
           );
@@ -86,17 +89,17 @@ const ExtrudeGeometry = (props) => {
           mesh9.position.set(
             parseFloat(props.width) - size / 2,
             parseFloat(props.height) / 2,
-            0
+            parseFloat(props.depth)/2
           );
           // rod10.position.set(0,2.5+0.25,2.5+0.25);
-          mesh10.position.set(size / 2, parseFloat(props.height) / 2 - size, 0);
+          mesh10.position.set(size / 2, parseFloat(props.height) / 2 - size, parseFloat(props.depth)/2);
           // rod11.position.set(0,-2.75,2.5+0.25);
-          mesh11.position.set(size / 2, -(parseFloat(props.height) / 2), 0);
+          mesh11.position.set(size / 2, -(parseFloat(props.height) / 2), parseFloat(props.depth)/2);
           // rod12.position.set(5+0.25-0.75,-2.75,2.5+0.25);
           mesh12.position.set(
             parseFloat(props.width) - size / 2,
             -(parseFloat(props.height) / 2 - size),
-            0
+            parseFloat(props.depth)/2
           );
 
         // Add the mesh to the scene
@@ -131,13 +134,14 @@ const ExtrudeGeometry = (props) => {
             });
 
         animate();
-        return (
-            <div className="my-canvas-container">
-            <canvas id="myCanvas" ref={canvasRef} />
-          </div>
-
-        );
+        
     }
+    );
+    return (
+        <div className="my-canvas-container">
+        <canvas id="myCanvas" ref={canvasRef} />
+      </div>
+
     );
 }
 

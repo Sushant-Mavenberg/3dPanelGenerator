@@ -5,6 +5,5 @@ body {
 
 canvas {
    
-        transform: translateX(850px) translateY(-400px);
-
+        transform: translateX(860px) translateY(-250px);
   }
