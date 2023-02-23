@@ -7,6 +7,7 @@ function App() {
     width: 0,
     height: 0,
     depth: 0,
+    sectionWidth: 0
   });
 
   const handleMeasurement = (e) => {
@@ -20,6 +21,18 @@ function App() {
   const handleButtonClick = (e) => {
     setShowComponent(true);
   };
+ 
+  // Getting value of radio input
+  const radios = document.getElementsByName('options');
+  let selectedValue;
+  
+  for (let i = 0; i < radios.length; i++) {
+    if (radios[i].checked) {
+      selectedValue = radios[i].value;
+      break;
+    }
+  }
+  
   return (
     <div>
       <header>
@@ -27,39 +40,64 @@ function App() {
       </header>
       <div className="container">
         <div>
+        <label>Width</label>
+        <br />
           <input
             id="width"
             type="text"
             name="width"
             onChange={handleMeasurement}
-          />{" "}
-          <br />
-          <label>Width</label>
+          />
+          
         </div>
+
         <div>
+        <label>Height</label>
+        <br />
           <input
             id="height"
             type="text"
             name="height"
             onChange={handleMeasurement}
           />
-          <br />
-          <label>Height</label>
+          
         </div>
+
         <div>
+        <label>Depth</label>
+        <br />
           <input
             id="depth"
             type="text"
             name="depth"
             onChange={handleMeasurement}
           />
+         
+          <div>
+          <label>Section Width</label>
           <br />
-          <label>Depth</label>
+            <input 
+              id="sectionWidth"
+              type="text"
+              name="sectionWidth"
+              onChange={handleMeasurement}
+            />
+          </div>
+
+          <div>  
+          <label>Start Section From</label>
           <br />
+            <div>
+              <input type="radio" id="left" name="options" value="left" />
+              <label htmlFor="option1">Left</label>
+
+              <input type="radio" id="right" name="options" value="right"/>
+              <label htmlFor="option2">Right</label>
+            </div>
+          </div>
           <div>
             <p>*Provide all dimensions in mm.</p>
           </div>
-
         </div>
       </div>
       <div>
@@ -69,6 +107,8 @@ function App() {
             width={measurements.width}
             height={measurements.height}
             depth={measurements.depth}
+            sectionWidth={measurements.sectionWidth}
+            startFrom={selectedValue}
           />
         )}
       </div>
