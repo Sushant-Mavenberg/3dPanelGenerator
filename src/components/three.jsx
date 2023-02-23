@@ -33,8 +33,8 @@ function Generate3DModel(props) {
     });
 
     // Create an axes helper
-    const axesHelper = new THREE.AxesHelper(5);
-    scene.add(axesHelper);
+    // const axesHelper = new THREE.AxesHelper(5);
+    // scene.add(axesHelper);
 
     // Create 2D shape to extrude
     const thickness = 0.0025; // Thickness of C type Channel
@@ -162,8 +162,8 @@ function Generate3DModel(props) {
     // creating metal sheets
     const sheetMaterial = new THREE.MeshStandardMaterial({
       color: 0x808080,
-      roughness: 0.8,
-      metalness: 0.8,
+      roughness: 0.4,
+      metalness: 0.12,
       side: DoubleSide
     });
 
@@ -187,7 +187,7 @@ function Generate3DModel(props) {
     const bottomSheet = new THREE.Mesh(topBottomSheetGeometry, sheetMaterial);
     bottomSheet.position.set((dimensions.width / 2),-(dimensions.height / 2),(dimensions.depth / 2));
     bottomSheet.rotation.set((Math.PI / 2), 0 , 0);
-
+   
     const leftSheet = new THREE.Mesh(leftRightSheetGeometry, sheetMaterial);
     leftSheet.position.set(0,0,(dimensions.depth / 2));
     leftSheet.rotation.set(0, (Math.PI / 2) , 0);
@@ -213,6 +213,14 @@ function Generate3DModel(props) {
       intensity: 1,
     });
     scene.add(ambientLight);
+
+    // Create a new instance of RectAreaLight
+    const rectLight = new THREE.RectAreaLight(0xffffff, 1);
+
+    // Set the position and rotation of the light
+    rectLight.position.set(0, 20, 0);
+    rectLight.rotation.set(Math.PI / 2, 0, 0);
+    scene.add(rectLight);
 
     const pointLight1 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
     pointLight1.position.set(2, 6, 3);
