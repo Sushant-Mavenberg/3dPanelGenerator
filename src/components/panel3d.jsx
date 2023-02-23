@@ -8,6 +8,9 @@ function Generate3DModel(props) {
   const canvasRef = useRef(null);
 
   const renderPanel = () => {
+    
+    const startTime = performance.now();
+    
     // Set up scene, camera, renderer and orbitControl
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
@@ -55,9 +58,9 @@ function Generate3DModel(props) {
 
     // Create Mesh of Three Types
     const dimensions = {
-      width: parseFloat(props.width),
-      height: parseFloat(props.height),
-      depth: parseFloat(props.depth),
+      width: parseFloat(props.width)/1000,
+      height: parseFloat(props.height)/1000,
+      depth: parseFloat(props.depth)/1000,
     };
 
     const extrudeSettings1 = {
@@ -77,26 +80,26 @@ function Generate3DModel(props) {
     const geometry2 = new THREE.ExtrudeGeometry(shape, extrudeSettings2);
     const geometry3 = new THREE.ExtrudeGeometry(shape, extrudeSettings3);
 
-    const material = new THREE.MeshStandardMaterial({
+    const channelMaterial = new THREE.MeshStandardMaterial({
       color: 0x808080,
-      roughness: 0.4,
-      metalness: 0.6
+      roughness: 0.8,
+      metalness: 0.8
     });
 
     // Defining the geometry of the c type channel and setting up its position
-    const channel1 = new THREE.Mesh(geometry2, material);
+    const channel1 = new THREE.Mesh(geometry2, channelMaterial);
     channel1.rotation.set(Math.PI / 2, 0, Math.PI / 2);
     channel1.position.set(web / 2, dimensions.height / 2, 0);
 
-    const channel2 = new THREE.Mesh(geometry2, material);
+    const channel2 = new THREE.Mesh(geometry2, channelMaterial);
     channel2.rotation.set(Math.PI / 2, 0, -(Math.PI / 2));
     channel2.position.set(dimensions.width - web / 2, dimensions.height / 2, web);
 
-    const channel3 = new THREE.Mesh(geometry2, material);
+    const channel3 = new THREE.Mesh(geometry2, channelMaterial);
     channel3.rotation.set(Math.PI / 2, 0, Math.PI / 2);
     channel3.position.set(web / 2, dimensions.height / 2, dimensions.depth - web);
 
-    const channel4 = new THREE.Mesh(geometry2, material);
+    const channel4 = new THREE.Mesh(geometry2, channelMaterial);
     channel4.rotation.set(Math.PI / 2, 0, -(Math.PI / 2));
     channel4.position.set(
       dimensions.width - web / 2,
@@ -104,19 +107,19 @@ function Generate3DModel(props) {
       dimensions.depth
     );
 
-    const channel5 = new THREE.Mesh(geometry1, material);
+    const channel5 = new THREE.Mesh(geometry1, channelMaterial);
     channel5.rotation.set(0, Math.PI / 2, 0);
     channel5.position.set(0, dimensions.height / 2 - web / 2, web);
 
-    const channel6 = new THREE.Mesh(geometry1, material);
+    const channel6 = new THREE.Mesh(geometry1, channelMaterial);
     channel6.rotation.set(0, Math.PI / 2, 0);
     channel6.position.set(0, dimensions.height / 2 - web / 2, dimensions.depth);
 
-    const channel7 = new THREE.Mesh(geometry1, material);
+    const channel7 = new THREE.Mesh(geometry1, channelMaterial);
     channel7.rotation.set(Math.PI, Math.PI / 2, 0);
     channel7.position.set(0, -(dimensions.height / 2 - web / 2), 0);
 
-    const channel8 = new THREE.Mesh(geometry1, material);
+    const channel8 = new THREE.Mesh(geometry1, channelMaterial);
     channel8.rotation.set(Math.PI, Math.PI / 2, 0);
     channel8.position.set(
       0,
@@ -124,19 +127,19 @@ function Generate3DModel(props) {
       (dimensions.depth - web)
     );
 
-    const channel9 = new THREE.Mesh(geometry3, material);
+    const channel9 = new THREE.Mesh(geometry3, channelMaterial);
     channel9.rotation.set(0, 0, -(Math.PI / 2));
     channel9.position.set(dimensions.width - web / 2, dimensions.height / 2, 0);
 
-    const channel10 = new THREE.Mesh(geometry3, material);
+    const channel10 = new THREE.Mesh(geometry3, channelMaterial);
     channel10.rotation.set(0, 0, Math.PI / 2);
     channel10.position.set(web / 2, dimensions.height / 2 - web, 0);
 
-    const channel11 = new THREE.Mesh(geometry3, material);
+    const channel11 = new THREE.Mesh(geometry3, channelMaterial);
     channel11.rotation.set(0, 0, Math.PI / 2);
     channel11.position.set(web / 2, -(dimensions.height / 2), 0);
 
-    const channel12 = new THREE.Mesh(geometry3, material);
+    const channel12 = new THREE.Mesh(geometry3, channelMaterial);
     channel12.rotation.set(0, 0, -(Math.PI / 2));
     channel12.position.set(
       dimensions.width - web / 2,
@@ -162,8 +165,8 @@ function Generate3DModel(props) {
     // creating metal sheets
     const sheetMaterial = new THREE.MeshStandardMaterial({
       color: 0x808080,
-      roughness: 0.8,
-      metalness: 0.8,
+      roughness: 0.4,
+      metalness: 0.06,
       side: DoubleSide
     });
 
@@ -212,30 +215,16 @@ function Generate3DModel(props) {
       color: 0xffffff,
       intensity: 1,
     });
+
+    // Create a new instance of RectAreaLight
+    const rectLight = new THREE.RectAreaLight(0xffffff, 1);
+
+    // Set the position and rotation of the light
+    rectLight.position.set(0, 20, 0);
+    rectLight.rotation.set(Math.PI / 2, 0, 0);
+
+    scene.add(rectLight);
     scene.add(ambientLight);
-
-    const pointLight1 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight1.position.set(2, 6, 3);
-
-    const pointLight2 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight2.position.set(10, -15, 5);
-
-    const pointLight3 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight3.position.set(-2, -5, 0);
-
-    const pointLight4 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight4.position.set(10, -15, 5);
-
-    const pointLight5 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight5.position.set(10, -15, 5);
-
-    // scene.add(
-    //   pointLight1, 
-    //   pointLight2, 
-    //   pointLight3, 
-    //   pointLight4, 
-    //   pointLight5
-    // );
 
     // Animate the scene
     function animate() {
@@ -244,6 +233,11 @@ function Generate3DModel(props) {
       renderer.render(scene, camera);
     }
     animate();
+    
+    const endTime = performance.now();
+    const loadingTime = (endTime - startTime) / 1000; // Convert to seconds
+
+    console.log(`Object loaded in ${loadingTime} seconds.`);
 
     return (
       <div className="my-canvas-container">

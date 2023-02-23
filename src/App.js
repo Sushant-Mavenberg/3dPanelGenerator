@@ -55,6 +55,11 @@ function App() {
           />
           <br />
           <label>Depth</label>
+          <br />
+          <div>
+            <p>*Provide all dimensions in mm.</p>
+          </div>
+
         </div>
       </div>
       <div>
