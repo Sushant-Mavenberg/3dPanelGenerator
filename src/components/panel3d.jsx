@@ -6,13 +6,15 @@ import { DoubleSide } from "three";
 
 function Generate3DModel(props) {
   const canvasRef = useRef(null);
-
-  const renderPanel = () => {
+  console.log(props)
+  const render3dPanel = () => {
     
     const startTime = performance.now();
     
     // Set up scene, camera, renderer and orbitControl
-    const scene = new THREE.Scene();
+    const scene = new THREE.Scene({
+      smoothShading: true
+    });
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -61,6 +63,7 @@ function Generate3DModel(props) {
       width: parseFloat(props.width)/1000,
       height: parseFloat(props.height)/1000,
       depth: parseFloat(props.depth)/1000,
+      sectionWidth: parseFloat(props.sectionWidth)/1000
     };
 
     const extrudeSettings1 = {
@@ -209,7 +212,71 @@ function Generate3DModel(props) {
       rightSheet, 
       backSheet
     );
-   
+
+    // Making Sections
+    const sections = Math.floor( dimensions.width / dimensions.sectionWidth);
+    if (props.startFrom === "right") {
+
+      for ( let i=1; i <= sections; i++ ) {
+        const sectionChannel1 = new THREE.Mesh(geometry2,channelMaterial); // front
+        sectionChannel1.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+        sectionChannel1.position.set((web / 2) + (i * dimensions.sectionWidth), dimensions.height / 2, dimensions.depth - web);
+
+        const sectionChannel2 = new THREE.Mesh(geometry2,channelMaterial); // back
+        sectionChannel2.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+        sectionChannel2.position.set(web / 2 + (i * dimensions.sectionWidth), dimensions.height / 2, 0);
+    
+        const sectionChannel3 = new THREE.Mesh(geometry3,channelMaterial); // top
+        sectionChannel3.rotation.set(0, 0, Math.PI / 2);
+        sectionChannel3.position.set(web / 2 + (i * dimensions.sectionWidth), dimensions.height / 2 - web, 0);
+        
+        const sectionChannel4 = new THREE.Mesh(geometry3,channelMaterial); // bottom
+        sectionChannel4.rotation.set(0, 0, Math.PI / 2);
+        sectionChannel4.position.set(web / 2 + (i * dimensions.sectionWidth), -(dimensions.height / 2), 0);
+        
+        scene.add(
+          sectionChannel1,
+          sectionChannel2,
+          sectionChannel3,
+          sectionChannel4
+        )
+      }
+    }
+
+    else {
+      for ( let i=1; i <= sections; i++ ) {
+        const sectionChannel1 = new THREE.Mesh(geometry2,channelMaterial); // front
+        sectionChannel1.rotation.set(Math.PI / 2, 0, -(Math.PI / 2));
+        sectionChannel1.position.set(
+        (dimensions.width - web / 2) - (i * dimensions.sectionWidth),
+        dimensions.height / 2,
+        dimensions.depth
+        );
+
+        const sectionChannel2 = new THREE.Mesh(geometry2,channelMaterial); // back
+        sectionChannel2.rotation.set(Math.PI / 2, 0, -(Math.PI / 2));
+        sectionChannel2.position.set((dimensions.width - web / 2) - (i * dimensions.sectionWidth), dimensions.height / 2, web);
+    
+        const sectionChannel3 = new THREE.Mesh(geometry3,channelMaterial); // top
+        sectionChannel3.rotation.set(0, 0, -(Math.PI / 2));
+        sectionChannel3.position.set((dimensions.width - web / 2) - (i * dimensions.sectionWidth), dimensions.height / 2, 0);
+        const sectionChannel4 = new THREE.Mesh(geometry3,channelMaterial); // bottom
+        sectionChannel4.rotation.set(0, 0, -(Math.PI / 2));
+        sectionChannel4.position.set(
+        (dimensions.width - web / 2) - (i * dimensions.sectionWidth),
+        -(dimensions.height / 2 - web),
+        0
+        );
+        scene.add(
+          sectionChannel1,
+          sectionChannel2,
+          sectionChannel3,
+          sectionChannel4
+        )
+      }
+      
+    }
+
     // Adding Lights to the scene
     const ambientLight = new THREE.AmbientLight({
       color: 0xffffff,
@@ -245,6 +312,8 @@ function Generate3DModel(props) {
       </div>
     );
   };
-renderPanel();
+
+  
+render3dPanel();
 }
 export default Generate3DModel;
