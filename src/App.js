@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Generate3DModel from "./components/three";
+import Generate3DModel from "./components/panel3d";
 
 function App() {
   const [showComponent, setShowComponent] = useState(false);
