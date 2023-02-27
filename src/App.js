@@ -85,7 +85,7 @@ function App() {
           </div>
 
           <div>  
-          <label>Start Section From</label>
+          <label>Start Sectioning From</label>
           <br />
             <div>
               <input type="radio" id="left" name="options" value="left" />
@@ -95,11 +95,13 @@ function App() {
               <label htmlFor="option2">Right</label>
             </div>
           </div>
+
           <div>
             <p>*Provide all dimensions in mm.</p>
           </div>
         </div>
       </div>
+
       <div>
         <button onClick={handleButtonClick}>Generate 3D Model</button>
         {showComponent && (
