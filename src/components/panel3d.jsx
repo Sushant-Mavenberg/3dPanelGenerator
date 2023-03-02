@@ -9,11 +9,12 @@ function Generate3DModel(props) {
   console.log(props.sections);
   const render3dPanel = () => {
     const startTime = performance.now();
+
     // Set up scene, camera, renderer and orbitControl
     const scene = new THREE.Scene({
       smoothShading: true,
     });
-    
+
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -61,22 +62,22 @@ function Generate3DModel(props) {
     const dimensions = {
       width: parseFloat(props.width) / 1000,
       height: parseFloat(props.height) / 1000,
-      depth: parseFloat(props.depth) / 1000
+      depth: parseFloat(props.depth) / 1000,
     };
 
     const extrudeSettings1 = {
       depth: dimensions.width, // along x-axis
-      bevelEnabled: false
+      bevelEnabled: false,
     };
 
     const extrudeSettings2 = {
       depth: dimensions.height, // along y-axis
-      bevelEnabled: false
+      bevelEnabled: false,
     };
-    
+
     const extrudeSettings3 = {
       depth: dimensions.depth, // along z-axis
-      bevelEnabled: false
+      bevelEnabled: false,
     };
 
     const geometry1 = new THREE.ExtrudeGeometry(shape, extrudeSettings1);
@@ -86,7 +87,7 @@ function Generate3DModel(props) {
     const channelMaterial = new THREE.MeshStandardMaterial({
       color: 0x808080,
       roughness: 0.4,
-      metalness: 0.4
+      metalness: 0.4,
     });
 
     // Defining the geometry of the c type channel and setting up its position
@@ -245,16 +246,18 @@ function Generate3DModel(props) {
     // Making Sections
     const sections = props.sections;
     const n = sections.length;
-                                      
+
     if (props.startFrom === "right") {
-      
       for (let i = 0; i < n; i++) {
         let secWidth = 0;
+        const sectionWidthList = [];
         if (i === 0) {
-          secWidth = parseFloat(sections[i].width)/1000;
+          sectionWidthList.push(parseFloat(sections[i].width) / 1000);
+          secWidth = parseFloat(sections[i].width) / 1000;
         } else {
           for (let j = 0; j <= i; j++) {
-            secWidth += parseFloat(sections[j].width)/1000;
+            sectionWidthList.push(parseFloat(sections[j].width) / 1000);
+            secWidth += parseFloat(sections[j].width) / 1000;
           }
         }
 
@@ -262,8 +265,9 @@ function Generate3DModel(props) {
           break;
         }
 
+        // Adding Vertical sections
         const vSectionChannel1 = new THREE.Mesh(geometry2, channelMaterial); // front
-        vSectionChannel1.rotation.set(Math.PI / 2, 0, (Math.PI / 2));
+        vSectionChannel1.rotation.set(Math.PI / 2, 0, Math.PI / 2);
         vSectionChannel1.position.set(
           web / 2 + secWidth,
           dimensions.height / 2,
@@ -300,22 +304,106 @@ function Generate3DModel(props) {
           vSectionChannel3,
           vSectionChannel4
         );
+
+        // Adding Horizontal sections
+
+        let feeders = sections[i].feeders;
+
+        for (let f = 0; f < feeders.length; f++) {
+          let feederHeight = 0;
+          if (f === 0) {
+            feederHeight = parseFloat(feeders[f].height) / 1000;
+          } else {
+            for (let k = 0; k <= f; k++) {
+              feederHeight += parseFloat(feeders[k].height) / 1000;
+            }
+          }
+
+          if (feederHeight >= dimensions.height) {
+            break;
+          }
+
+          const extrudeSettings = {
+            depth: sectionWidthList[i] - flange, // along x-axis
+            bevelEnabled: false,
+          };
+          const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+          console.log(i === 0 ? flange : secWidth - sectionWidthList[i - 1]);
+          const hSectionChannel1 = new THREE.Mesh(geometry, channelMaterial); // front
+          hSectionChannel1.rotation.set(Math.PI / 2, Math.PI / 2, 0);
+          hSectionChannel1.position.set(
+            i === 0 ? flange : secWidth - sectionWidthList[i] + flange,
+            feederHeight - dimensions.height / 2,
+            dimensions.depth - flange
+          );
+
+          const hSectionChannel2 = new THREE.Mesh(geometry, channelMaterial); // back
+          hSectionChannel2.rotation.set(3 * (Math.PI / 2), Math.PI / 2, 0);
+          hSectionChannel2.position.set(
+            i === 0 ? flange : secWidth - sectionWidthList[i] + flange,
+            feederHeight + web - dimensions.height / 2,
+            flange
+          );
+
+          const hSectionChannel3 = new THREE.Mesh(geometry3, channelMaterial); // right
+          hSectionChannel3.rotation.set(0, 0, Math.PI / 2);
+          hSectionChannel3.position.set(
+            i === 0 ? flange : secWidth - sectionWidthList[i] + flange,
+            feederHeight - dimensions.height / 2,
+            0
+          );
+
+          const hSectionChannel4 = new THREE.Mesh(geometry3, channelMaterial); // left
+          hSectionChannel4.rotation.set(0, 0, 3 * (Math.PI / 2));
+          hSectionChannel4.position.set(
+            secWidth,
+            feederHeight + web - dimensions.height / 2,
+            0
+          );
+          
+          // Adding metalSheet on feeder
+          const feederSheetGeometry = new THREE.PlaneGeometry(
+            sectionWidthList[i],
+            dimensions.depth
+          );
+          const feederSheet = new THREE.Mesh(
+            feederSheetGeometry,
+            sheetMaterial
+          );
+          feederSheet.rotateX(Math.PI/2);
+          feederSheet.position.set(
+            secWidth - (sectionWidthList[i]/2)  + 0.01,feederHeight - dimensions.height / 2 + web + 0.0002,dimensions.depth/2
+          );
+
+          scene.add(
+            hSectionChannel1,
+            hSectionChannel2,
+            hSectionChannel3,
+            hSectionChannel4,
+            feederSheet
+          );
+        }
       }
     } else {
       for (let i = 0; i < n; i++) {
         let secWidth = 0;
+        const sectionWidthList = [];
         if (i === 0) {
-          secWidth = parseFloat(sections[i].width)/1000;
+          sectionWidthList.push(parseFloat(sections[i].width) / 1000);
+          secWidth = parseFloat(sections[i].width) / 1000;
         } else {
           for (let j = 0; j <= i; j++) {
-            secWidth += parseFloat(sections[j].width)/1000;
+            sectionWidthList.push(parseFloat(sections[j].width) / 1000);
+            secWidth += parseFloat(sections[j].width) / 1000;
           }
         }
-
+       
         if (secWidth >= dimensions.width) {
           break;
         }
 
+        // Adding Vertical sections
         const vSectionChannel1 = new THREE.Mesh(geometry2, channelMaterial); // front
         vSectionChannel1.rotation.set(Math.PI / 2, 0, -(Math.PI / 2));
         vSectionChannel1.position.set(
@@ -354,6 +442,85 @@ function Generate3DModel(props) {
           vSectionChannel3,
           vSectionChannel4
         );
+
+        // Adding Horizontal sections
+
+        let feeders = sections[i].feeders;
+
+        for (let f = 0; f < feeders.length; f++) {
+          let feederHeight = 0;
+          if (f === 0) {
+            feederHeight = parseFloat(feeders[f].height) / 1000;
+          } else {
+            for (let k = 0; k <= f; k++) {
+              feederHeight += parseFloat(feeders[k].height) / 1000;
+            }
+          }
+
+          if (feederHeight >= dimensions.height) {
+            break;
+          }
+
+          const extrudeSettings = {
+            depth: sectionWidthList[i] - flange, // along x-axis
+            bevelEnabled: false,
+          };
+          const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+          const hSectionChannel1 = new THREE.Mesh(geometry, channelMaterial); // front
+          hSectionChannel1.rotation.set(Math.PI / 2, Math.PI / 2, 0);
+          hSectionChannel1.position.set(
+            i === 0 ? flange : secWidth - sectionWidthList[i] + flange,
+            feederHeight - dimensions.height / 2,
+            dimensions.depth - flange
+          );
+
+          const hSectionChannel2 = new THREE.Mesh(geometry, channelMaterial); // back
+          hSectionChannel2.rotation.set(3 * (Math.PI / 2), Math.PI / 2, 0);
+          hSectionChannel2.position.set(
+            i === 0 ? flange : secWidth - sectionWidthList[i] + flange,
+            feederHeight + web - dimensions.height / 2,
+            flange
+          );
+
+          const hSectionChannel3 = new THREE.Mesh(geometry3, channelMaterial); // right
+          hSectionChannel3.rotation.set(0, 0, Math.PI / 2);
+          hSectionChannel3.position.set(
+            i === 0 ? flange : secWidth - sectionWidthList[i] + flange,
+            feederHeight - dimensions.height / 2,
+            0
+          );
+
+          const hSectionChannel4 = new THREE.Mesh(geometry3, channelMaterial); // left
+          hSectionChannel4.rotation.set(0, 0, 3 * (Math.PI / 2));
+          hSectionChannel4.position.set(
+            secWidth,
+            feederHeight + web - dimensions.height / 2,
+            0
+          );
+          
+          // Adding metalSheet on feeder
+          const feederSheetGeometry = new THREE.PlaneGeometry(
+            sectionWidthList[i],
+            dimensions.depth
+          );
+          const feederSheet = new THREE.Mesh(
+            feederSheetGeometry,
+            sheetMaterial
+          );
+          feederSheet.rotateX(Math.PI/2);
+          feederSheet.position.set(
+            secWidth - (sectionWidthList[i]/2)  + 0.01,feederHeight - dimensions.height / 2 + web + 0.0002,dimensions.depth/2
+          );
+
+          scene.add(
+            hSectionChannel1,
+            hSectionChannel2,
+            hSectionChannel3,
+            hSectionChannel4,
+            feederSheet
+          );
+        }
       }
     }
 
@@ -365,15 +532,15 @@ function Generate3DModel(props) {
 
     // PointLights
     const pointLight1 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight1.position.set(dimensions.width/2, -200, dimensions.depth/2);
+    pointLight1.position.set(dimensions.width / 2, -200, dimensions.depth / 2);
     const pointLight2 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight2.position.set(-200, dimensions.height/2, dimensions.depth/2);
+    pointLight2.position.set(-200, dimensions.height / 2, dimensions.depth / 2);
     const pointLight3 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight3.position.set(200, dimensions.height/2, dimensions.depth/2);
+    pointLight3.position.set(200, dimensions.height / 2, dimensions.depth / 2);
     const pointLight4 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight4.position.set(dimensions.width/2, 200, dimensions.depth/2);
+    pointLight4.position.set(dimensions.width / 2, 200, dimensions.depth / 2);
     const pointLight5 = new THREE.PointLight({ color: 0xffffff, intensity: 1 });
-    pointLight5.position.set(dimensions.width/2, 200, dimensions.depth/2);
+    pointLight5.position.set(dimensions.width / 2, 200, dimensions.depth / 2);
 
     // Create a new instance of RectAreaLight
     const rectLight = new THREE.RectAreaLight(0xffffff, 1);
@@ -382,7 +549,15 @@ function Generate3DModel(props) {
     rectLight.position.set(0, 20, 0);
     rectLight.rotation.set(Math.PI / 2, 0, 0);
 
-    scene.add(rectLight,ambientLight,pointLight1,pointLight2,pointLight3,pointLight4,pointLight5);
+    scene.add(
+      rectLight,
+      ambientLight,
+      pointLight1,
+      pointLight2,
+      pointLight3,
+      pointLight4,
+      pointLight5
+    );
 
     // Animate the scene
     function animate() {
@@ -404,5 +579,5 @@ function Generate3DModel(props) {
   };
 
   render3dPanel();
-};
+}
 export default Generate3DModel;
